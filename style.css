@@ -1,0 +1,91 @@
+body {
+  font-family: "Georgia", serif;
+  text-align: center;
+  background: linear-gradient(to bottom right, #f5e1ff, #d0c3ff);
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  margin-top: 30px;
+  color: #5a2d91;
+}
+
+/* Envelope look */
+.envelope {
+  width: 200px;
+  height: 120px;
+  background: #fff;
+  margin: 80px auto;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.5s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-radius: 10px;
+}
+
+.envelope .flap {
+  width: 0;
+  height: 0;
+  border-left: 100px solid transparent;
+  border-right: 100px solid transparent;
+  border-bottom: 60px solid #d8b6ff;
+  position: absolute;
+  top: -60px;
+  left: 0;
+  transition: all 0.6s ease;
+}
+
+.envelope .body {
+  padding-top: 30px;
+  color: #555;
+}
+
+.envelope.open {
+  transform: translateY(-20px);
+}
+
+.envelope.open .flap {
+  transform: rotateX(180deg);
+  border-bottom-color: #b693f3;
+}
+
+/* Letter box (hidden part) */
+.hidden {
+  display: none;
+}
+
+#letterBox {
+  margin-top: 20px;
+  background: #fff;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 15px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+textarea {
+  width: 90%;
+  height: 100px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+button {
+  background: #7c4dff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #5e35b1;
+}

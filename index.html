@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secret Letter 💌</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+
+<h1>💌 Secret Letter Exchange</h1>
+
+<div class="envelope">
+  <div class="flap"></div>
+  <div class="body">
+    <p>Click to open the envelope!</p>
+  </div>
+</div>
+
+<div id="letterBox" class="hidden">
+  <h2>📜 Write or Read Letter</h2>
+
+  <textarea id="message" placeholder="Write your letter here..."></textarea><br>
+  <input id="password" type="password" placeholder="Enter password"><br>
+
+  <button onclick="encryptLetter()">🔐 Encrypt</button>
+  <button onclick="decryptLetter()">🔓 Decrypt</button>
+
+  <p>💬 Result:</p>
+  <textarea id="output" readonly></textarea>
+</div>
+
+<script>
+function encryptLetter() {
+  const message = document.getElementById("message").value;
+  const password = document.getElementById("password").value;
+  const encrypted = CryptoJS.AES.encrypt(message, password).toString();
+  document.getElementById("output").value = encrypted;
+}
+
+function decryptLetter() {
+  const encrypted = document.getElementById("message").value;
+  const password = document.getElementById("password").value;
+  const decrypted = CryptoJS.AES.decrypt(encrypted, password).toString(CryptoJS.enc.Utf8);
+  document.getElementById("output").value = decrypted || "⚠️ Wrong password or invalid text";
+}
+
+// When you click the envelope, show the letter box
+document.querySelector('.envelope').onclick = () => {
+  document.querySelector('.envelope').classList.add('open');
+  document.getElementById('letterBox').classList.remove('hidden');
+};
+</script>
+
+</body>
+</html>
