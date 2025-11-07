@@ -2,54 +2,341 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Secret Letter 💌</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Letter</title>
+
+<style>
+:root {
+  --primary: #fff;
+  --bg-gradient: linear-gradient(180deg, #ffaeed, #ffffff);
+  --envelope-light: #f3e2be;
+  --envelope-mid: #e9d7a8;
+  --envelope-dark: #e3cfa2;
+  --heart: #ff3dcf;
+  --text: #444;
+  --shadow: rgba(0, 0, 0, 0.25);
+}
+
+/* PAGE BACKGROUND */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-gradient);
+  overflow: hidden;
+}
+
+/* === 🦋 Butterfly Animation === */
+.butterfly {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-image: url("butterfly.png"); /* <-- place this image in same folder */
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation: fly 10s linear infinite;
+}
+
+@keyframes fly {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(50vw) translateY(-100px) rotate(20deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100vw) translateY(-200px) rotate(45deg);
+  }
+}
+
+/* ENVELOPE CONTAINER */
+.container {
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: showUp 2s ease forwards;
+  animation-delay: 2s;
+}
+
+@keyframes showUp {
+  to { opacity: 1; }
+}
+
+/* ENVELOPE */
+.envelope-wrapper {
+  position: relative;
+  background: var(--envelope-light);
+  box-shadow: 0 0 40px var(--shadow);
+}
+
+.envelope {
+  position: relative;
+  width: 300px;
+  height: 230px;
+}
+
+/* FLAP */
+.envelope::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top: 130px solid var(--envelope-mid);
+  border-left: 150px solid transparent;
+  border-right: 150px solid transparent;
+  transform-origin: top center;
+  transition: transform 0.6s ease-in-out;
+  z-index: 3;
+}
+
+/* BODY */
+.envelope::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-top: 130px solid transparent;
+  border-left: 150px solid var(--envelope-dark);
+  border-right: 150px solid var(--envelope-dark);
+  border-bottom: 100px solid var(--envelope-dark);
+  z-index: 2;
+}
+
+/* LETTER */
+.letter {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 80%;
+  background: var(--primary);
+  border-radius: 8px;
+  box-shadow: 0 0 5px var(--shadow);
+  padding: 20px 15px;
+  text-align: left;
+  transition: all 1s ease-in-out;
+  z-index: 1;
+  overflow: hidden; /* hides the part of the letter sticking out */
+}
+
+.letter .text {
+  font-family: "Gill Sans", Calibri, sans-serif;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.letter .text {
+  font-family: "Gill Sans", Calibri, sans-serif;
+  font-size: 12px;
+  color: var(--text);
+}
+/* HEART SEAL */
+.heart {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg); /* existing heart rotation */
+  width: 15px;
+  height: 15px;
+  background: var(--heart-color);
+  z-index: 4; /* heart behind */
+  transition: transform 0.5s ease-in-out 1s;
+  box-shadow: 0 1px 6px var(--shadow-color);
+  cursor: pointer;
+}
+
+/* Heart’s round bumps */
+.heart::before,
+.heart::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: var(--heart-color);
+  border-radius: 50%;
+}
+.heart::before {
+  top: -7.5px;
+}
+.heart::after {
+  right: 7.5px;
+}
+
+/* Your new image seal sits above */
+.heart img {
+  position: absolute;
+  top: -10px;       /* adjust to match center */
+  left: -10px;
+  width: 40px;      /* adjust image size */
+  height: auto;
+  z-index: 10;      /* higher number = in front */
+  transform: rotate(-45deg); /* counter heart rotation if needed */
+  pointer-events: none; /* optional, lets click go to the heart */
+}
+
+/* OPEN STATES */
+.flap .envelope::before {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+.flap .letter {
+  bottom: 100px;
+  transform: translateX(-50%) scale(1.2);
+}
+.flap .heart {
+  transform: translateX(-50%) rotate(20deg);
+}
+
+/* FULLSCREEN LETTER */
+.letter.open-letter {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  width: 90vw;
+  height: 85vh;
+  background: var(--primary);
+  padding: 40px 30px;
+  z-index: 999;
+  box-shadow: 0 0 50px var(--shadow);
+  overflow-y: auto;
+  border-radius: 12px;
+  transition: all 0.6s ease-in-out;
+  animation: fadeIn 0.4s ease forwards;
+}
+.letter.open-letter::after {
+  content: "✖ Click anywhere to close";
+  position: fixed;
+  top: 12px;
+  right: 20px;
+  font-size: 13px;
+  color: #777;
+  font-family: sans-serif;
+}
+.mute-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  z-index: 10000; /* ensure it's above everything */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.3s ease;
+}
+
+.mute-btn:hover {
+  background: rgba(255,255,255,1);
+}
+
+</style>
 </head>
 <body>
 
-<h1>💌 Secret Letter Exchange</h1>
+<!-- 🦋 Butterflies -->
+<div class="butterfly" style="top: 70%; left: -60px; animation-delay: 0s;"></div>
+<div class="butterfly" style="top: 50%; left: -60px; animation-delay: 2s;"></div>
+<div class="butterfly" style="top: 60%; left: -60px; animation-delay: 4s;"></div>
 
-<div class="envelope">
-  <div class="flap"></div>
-  <div class="body">
-    <p>Click to open the envelope!</p>
+ <audio id="bgMusic" loop>
+    <source src="John Lennon — Woman (LYRICS) [bcQrz_YXVNY].mp3" type="audio/mp3" autoplay loop>
+  </audio>
+
+  <button class="mute-btn" id="muteBtn">🔈Click here to see the song</button>
+
+
+<!-- Envelope and Letter -->
+<div class="container">Tap the seal to open it
+  <div class="envelope-wrapper">
+    <div class="envelope">
+      <div class="letter"> <h5 color="gray">[Click here to expand]</h5>
+        <div class="text" style="font-size:30px; font-family: garamond;">
+          <h4>Dearest Kasih Anysa,</h4>
+          Assalamualaikum, Happy Birthday I bid to the one charmful and persistent  🦋<br><br>
+          Alhamdulillah for your presence, as I am here to wish and doa for nothing but your successful.<br><br>
+            
+          I bid an honest prayer from thus honest Puck, <br>
+          Danish doakan Kasih sentiasa berada dalam keredhaan serta rahmatNya,<br>
+          Dikurniakan rezeki yang melimpah supaya terus menjadi tangan yang memberi,<br>
+          dikelilingi keluarga yang harmoni,<br>
+          dianugerahkan kesihatan seperti insan yang tidak pernah mengenal lelah untuk berbakti,<br>
+          diberi ilmu yang luas untuk dikongsi,<br>
+          dan ditemukan dengan rusuk kanan yang sentiasa melindungi.<br>
+          Kecantikan Kasih, moga terus menjadi cahaya yang menceriakan setiap suasana. <br>
+          Amin Ya Mujeeb<br><br>
+
+          Teruskan mencari makna kasih dalam namamu sendiri di dalam pencarian rahmatNya, sesungguhnya Kasih mampu menyelamatkan orang yg berada dlm kesusahan sepertimana yg diperlakukan kepada Danish utk berada di dalam pelukanNya—terima kasih atas majlis ilmu yang diperkenankan oleh Kasih.<br>
+
+          Thank you for making days become longer and worth living. You are nothing but the testament of Allah’s presence. Indeed, the muse I may called. <br><br>
+
+          Thank you for brought to me purposes—trully that, purpose is glorious—Loki<br><br>
+          
+          Thank you for being the fox of this little prince, the new adventure and literary world has nothing to offer but introspection—constructed new perception over you, the world, and the hereafter.<br><br>
+
+          Thank you for the wisdom, taught me selflessness, the virtue of men—changed my brain chemistry.<br><br>
+
+          Thank you for being soooo accommodating as well, your presence radiates delight and emits credibility thru men—I amend, for being a man.<br><br>
+
+          Thank you for always doakan Danish, one day you will see I ascended by your doa.<br><br>
+
+          Pray for the wellbeing of Danish and his family,
+          just as Danish always slips Kasih’s name & family into his prayers.
+          InshaAllah, together we shall build an empire blessed by His grace.<br>
+          <p>Barakallahufik.</p>
+          <p>Happy Birthday Kasih Anysa!</p><br>
+          —Danish Danial
+
+
+        </div>
+      </div>
+    </div>
+    <div class="heart">
+       <img src="C:\Users\ASUS\Downloads\wax.png" alt="Seal">
+    </div>
   </div>
 </div>
 
-<div id="letterBox" class="hidden">
-  <h2>📜 Write or Read Letter</h2>
-
-  <textarea id="message" placeholder="Write your letter here..."></textarea><br>
-  <input id="password" type="password" placeholder="Enter password"><br>
-
-  <button onclick="encryptLetter()">🔐 Encrypt</button>
-  <button onclick="decryptLetter()">🔓 Decrypt</button>
-
-  <p>💬 Result:</p>
-  <textarea id="output" readonly></textarea>
-</div>
-
 <script>
-function encryptLetter() {
-  const message = document.getElementById("message").value;
-  const password = document.getElementById("password").value;
-  const encrypted = CryptoJS.AES.encrypt(message, password).toString();
-  document.getElementById("output").value = encrypted;
-}
+const heart = document.querySelector(".heart");
+const envelopeWrapper = document.querySelector(".envelope-wrapper");
+const letter = document.querySelector(".letter");
 
-function decryptLetter() {
-  const encrypted = document.getElementById("message").value;
-  const password = document.getElementById("password").value;
-  const decrypted = CryptoJS.AES.decrypt(encrypted, password).toString(CryptoJS.enc.Utf8);
-  document.getElementById("output").value = decrypted || "⚠️ Wrong password or invalid text";
-}
+heart.addEventListener("click", () => {
+  envelopeWrapper.classList.toggle("flap");
+});
 
-// When you click the envelope, show the letter box
-document.querySelector('.envelope').onclick = () => {
-  document.querySelector('.envelope').classList.add('open');
-  document.getElementById('letterBox').classList.remove('hidden');
-};
+letter.addEventListener("click", () => {
+  letter.classList.toggle("open-letter");
+});
+
+//sound control
+const music = document.getElementById('bgMusic');
+const muteBtn = document.getElementById('muteBtn');
+
+let isMuted = false;
+muteBtn.addEventListener('click', () => {
+  isMuted = !isMuted;
+  if (isMuted) {
+    music.pause();
+    muteBtn.textContent = '🔈Play Woman by John Lennon';
+  } else {
+    music.play();
+    muteBtn.textContent = '🔇 Mute';
+  }
+});
+
 </script>
 
 </body>
